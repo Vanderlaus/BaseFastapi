@@ -1,5 +1,7 @@
 from fastapi import FastAPI, HTTPException, status
 from models import Aluno
+from fastapi import Response
+from fastapi import Path
 
 app = FastAPI()
 
@@ -33,7 +35,6 @@ async def get_alunos():
 async def update(aluno_id:int):
     try:
         aluno = alunos[aluno_id]
-        alunos.update({"id":aluno_id})
         return aluno
     except KeyError:
         raise HTTPException(
@@ -46,6 +47,35 @@ async def post_aluno(aluno:Aluno):
     alunos[next_id] = aluno
     del aluno.id
     return aluno
+
+@app.get('/calculadora/')
+async def calcular(num1:int, num2:int, num3:int):
+    soma = num1 + num2 + num3
+    raise HTTPException(
+        status_code=status.HTTP_200_OK detail=f"A soma de {num1}, {num2} e {num3} é {soma}"
+    )
+
+@app.put("/alunos/{aluno_id}")
+async def put_aluno(aluno_id:int, aluno:Aluno):
+    if aluno_id in alunos:
+        alunos[aluno_id] = aluno
+        del aluno.id
+        return aluno
+    else:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Aluno nao encontrado."
+        )
+
+@app.delete("/alunos/{aluno_id}")
+async def delete_aluno(aluno_id:int):
+    if aluno_id in alunos:
+        del alunos[aluno_id]
+        return Response(status_code=status.HTTP_204_NO_CONTENT)
+            #status_code=status.HTTP_200_OK, detail="Aluno deletado com sucesso."
+    else:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Aluno nao encontrado."
+        )
 
 @app.get("/alunosnomes/{aluno_nome}")
 async def get_Nomealuno(aluno_nome:str):
