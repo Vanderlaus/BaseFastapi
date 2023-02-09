@@ -1,1 +1,3 @@
 from aluno_models import AlunoModel
+from professor_models import ProfessorModel
+from usuario_models import UsuarioModel
